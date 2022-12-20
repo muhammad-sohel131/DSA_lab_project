@@ -180,7 +180,10 @@ void findByPhone()
 
             if(option == 1)
             {
-
+                printf("Please, enter the bill: ");
+                scanf("%d", &bill);
+                temp -> totalBill += bill;
+                printf("The bill is added!\nYour current due is %d", temp -> totalBill - temp -> totalPaid);
             }
             else if(option == 2)
             {
