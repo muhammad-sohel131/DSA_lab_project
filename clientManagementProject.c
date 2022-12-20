@@ -4,19 +4,18 @@
 
 void registerClient();
 void showAllClient();
-void deleteClient();
 int existClient(char phone[]);
 
 
 typedef struct Clients client;
+void updateClientAccount(client *prev, client *temp);
 client *create_node();
 
 struct Clients
 {
     char name[50];
     char phone[20];
-    int totalBill;
-    int totalPaid;
+    int due;
     client *next;
 };
 
@@ -28,7 +27,6 @@ int main()
     printf("--------------------\n");
     printf("Client Management\n");
     printf("--------------------\n\n");
-
 
     while(1)
     {
@@ -64,6 +62,7 @@ int main()
         {
             printf("Invalid Input\n");
         }
+
     }
 
     return 0;
@@ -72,8 +71,7 @@ int main()
 client *create_node()
 {
     client *newNode = malloc(sizeof(client));
-    newNode -> totalBill = 0;
-    newNode -> totalPaid = 0;
+    newNode -> due = 0;
     newNode -> next = NULL;
 
     return newNode;
@@ -117,12 +115,11 @@ void registerClient()
         printf("The client is registered!\n");
         return ;
     }
-
 }
 
 void showAllClient()
 {
-    int total, i = 1;
+    int i = 1;
 
     client *temp = head;
 
@@ -136,8 +133,7 @@ void showAllClient()
     }
     while(temp != NULL)
     {
-        total = temp -> totalBill - temp -> totalPaid;
-        printf("%d. Name: %s  Phone: %s  Due: %d\n",i++, temp -> name, temp -> phone, total);
+        printf("%d. Name: %s  Phone: %s  Due: %d\n",i++, temp -> name, temp -> phone, temp -> due);
         temp = temp -> next;
     }
 
@@ -149,7 +145,7 @@ void findByPhone()
 {
     char phone[20];
     client *temp = head;
-    int bill, paid, total, option;
+    client *prev = NULL;
 
     printf("Please enter phone number: ");
     scanf("%s", phone);
@@ -166,55 +162,18 @@ void findByPhone()
 
     if(temp != NULL)
     {
-        total = temp -> totalBill - temp -> totalPaid;
-        printf("Name: %s  \nPhone: %s  \nDue: %d\n", temp -> name, temp -> phone, total);
-
-        while(1)
-        {
-            printf("1. Add Bill\n");
-            printf("2. Add Diposit\n");
-            printf("3. Delete Account \n");
-            printf("4. Back to Main Menu \n");
-
-            scanf("%d", &option);
-
-            if(option == 1)
-            {
-                printf("Please, enter the bill: ");
-                scanf("%d", &bill);
-                temp -> totalBill += bill;
-                printf("The bill is added!\nYour current due is %d", temp -> totalBill - temp -> totalPaid);
-            }
-            else if(option == 2)
-            {
-
-            }
-            else if(option == 3)
-            {
-
-            }
-            else if(option == 4)
-            {
-                return ;
-            }
-            else
-            {
-                printf("Invalid Input\n");
-            }
-        }
+        updateClientAccount(prev, temp);
+    }else {
+        printf("Not found!\n");
     }
-
-    printf("Not found!\n");
-
-    return 0;
 
 }
 
 void findByName()
 {
-    int total, option;
     char name[20], savedName[20];
     client *temp = head;
+    client *prev = NULL;
 
     printf("Please Enter Name: ");
     scanf(" %[^\n]", name);
@@ -227,52 +186,16 @@ void findByName()
         {
             break;
         }
+        prev = temp;
         temp = temp -> next;
     }
 
     if(temp != NULL)
     {
-        total = temp -> totalBill - temp -> totalPaid;
-        printf("Name: %s  \nPhone: %s  \nDue: %d\n", temp -> name, temp -> phone, total);
-
-        while(1)
-        {
-            printf("1. Add Bill\n");
-            printf("2. Add Diposit\n");
-            printf("3. Delete Account \n");
-            printf("4. Back to Main Menu \n");
-
-            scanf("%d", &option);
-
-            if(option == 1)
-            {
-
-            }
-            else if(option == 2)
-            {
-
-            }
-            else if(option == 3)
-            {
-
-            }
-            else if(option == 4)
-            {
-                return ;
-            }
-            else
-            {
-                printf("Invalid Input\n");
-            }
-        }
+        updateClientAccount(prev, temp);
     }
 
     printf("Not found!\n");
-
-}
-
-void deleteClient()
-{
 
 }
 
@@ -298,4 +221,54 @@ int existClient(char phone[])
     {
         return 1;
     }
+}
+
+
+void updateClientAccount(client *prev, client *temp){
+     int option, amount;
+
+    printf("Name: %s  \nPhone: %s  \nDue: %d\n", temp -> name, temp -> phone, temp -> due);
+
+        while(1)
+        {
+            printf("1. Add Bill\n");
+            printf("2. Add Diposit\n");
+            printf("3. Delete Account \n");
+            printf("4. Back to Main Menu \n");
+
+            scanf("%d", &option);
+
+            if(option == 1)
+            {
+                printf("Please, enter the bill: ");
+                scanf("%d", &amount);
+                temp -> due += amount;
+                printf("The bill is added!\nYour current due is %d\n", temp -> due);
+            }
+            else if(option == 2)
+            {
+                printf("Please, enter the amount: ");
+                scanf("%d", &amount);
+                temp -> due -= amount;
+                printf("The bill is added!\nYour current due is %d\n", temp -> due);
+            }
+            else if(option == 3)
+            {
+                if(temp == head){
+                    head = temp -> next;
+                    free(temp);
+                }else {
+                    prev -> next = temp -> next;
+                    free(temp);
+                }
+            }
+            else if(option == 4)
+            {
+                return ;
+            }
+            else
+            {
+                printf("Invalid Input\n");
+            }
+        }
 }
