@@ -5,6 +5,7 @@
 void registerClient();
 void showAllClient();
 int existClient(char phone[]);
+void sortByDue();
 
 
 typedef struct Clients client;
@@ -34,7 +35,8 @@ int main()
         printf("2. List of all Clients\n");
         printf("3. Search By Name \n");
         printf("4. Search By Phone Number \n");
-        printf("5. Exit\n");
+        printf("5. Sort By Due\n");
+        printf("6. Exit\n");
 
         scanf("%d", &option);
 
@@ -54,7 +56,10 @@ int main()
         {
             findByPhone();
         }
-        else if(option == 5)
+        else if(option == 5){
+            sortByDue();
+        }
+        else if(option == 6)
         {
             exit(1);
         }
@@ -73,7 +78,6 @@ client *create_node()
     client *newNode = malloc(sizeof(client));
     newNode -> due = 0;
     newNode -> next = NULL;
-
     return newNode;
 }
 
@@ -106,12 +110,14 @@ void registerClient()
     }
     else
     {
-        client *temp = head;
-        while(temp -> next != NULL)
+        client *current = head;
+        while(current -> next != NULL)
         {
-            temp = temp -> next;
+            current = current -> next;
         }
-        temp -> next = new_client;
+
+        current -> next = new_client;
+
         printf("The client is registered!\n");
         return ;
     }
@@ -271,4 +277,41 @@ void updateClientAccount(client *prev, client *temp){
                 printf("Invalid Input\n");
             }
         }
+}
+
+//bubble sort
+void sortByDue(){
+
+    client *temp = head;
+    client *prev = NULL;
+    client *t, *end = NULL;
+
+    while(end != head){
+        temp = head;
+        while(temp -> next != end){
+            if(temp -> due > temp -> next -> due){
+                if(temp == head){
+                    head = head -> next;
+                    temp -> next = temp -> next -> next;
+                    head -> next = temp;
+
+                    prev = head;
+                    continue;
+                }
+                prev -> next = temp -> next;
+                t = temp -> next -> next;
+                temp -> next -> next = temp;
+                temp -> next = t;
+
+                prev = temp -> next;
+            }else {
+                prev = temp;
+                temp = temp -> next;
+            }
+
+        }
+        end = temp;
+    }
+    head = end;
+
 }
